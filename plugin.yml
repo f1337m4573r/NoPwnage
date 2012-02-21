@@ -1,0 +1,8 @@
+name: NoPwnage
+
+version: ${project.version}
+description: ${project.description}
+
+author: Evenprime
+
+main: cc.co.evenprime.bukkit.nopwnage.NoPwnage
