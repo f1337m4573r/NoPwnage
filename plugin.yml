@@ -6,3 +6,21 @@ description: ${project.description}
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nopwnage.NoPwnage
+
+commands:
+  nopwnage:
+    description: NoPwnage command
+    permission: nopwnage.admin
+    usage: |
+           /<command> : Turn NoPwnage on/off
+
+permissions:
+  nopwnage:
+    description: Allow a player to do everything related to NoPwnage
+    children:
+      nopwnage.admin:
+        description: Give a player access to the "/nopwnage" command
+      nopwnage.login:
+        description: Don't monitor the players relogging behaviour
+      nopwnage.spam:
+        description: Don't monitor the players chat messages at all

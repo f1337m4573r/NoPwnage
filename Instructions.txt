@@ -21,24 +21,60 @@
 
  NoPwnage will assign each message of each player a certain "suspicion" value,
  based on numerous properties, circumstances etc.
- 
+
  If a message of a player reaches a specific suspicion level, the player may
  get warned to change his behaviour. If he reaches an even higher suspicion
  level, he will get banned (by default) or otherwise handled, depending on the
  config file.
- 
+
  In addition to that, players that rejoin the game after leaving it really fast
  will also be subjected to warnings and finally penalties.
 
  You have control about how much suspicion each property of the message will
  "earn". For most properties you have the option:
- 
+
  - enabled: should this property be considered at all
- 
+
  - weight:  how much suspicion is given for full-filling the conditions
- 
+
  - timeout: how much time in milliseconds (1000 = 1 second) has to pass before
             this property becomes reset/ignored (depends on the property).
+
+
+################################################################################
+#                                                                              #
+#                                Permissions                                   #
+#                                                                              #
+################################################################################
+
+  NoPwnage allows you to give players special permissions to e.g. bypass the
+  checks or to administrate the plugin.
+
+   nopwnage.admin:
+     The player can use the "nopwnage" command to switch the plugin on/off
+
+   nopwnage.spam:
+     The player will be ignored by the spam checking part of NoPwnage. Only
+     give this to trusted users and NOT to new users that didn't visit your
+     server before.
+
+   nopwnage.login:
+     The player will be ignored by the "relog" checking part of NoPwnage. Only
+     give this to trusted users and NOT to new users that didn't visit your
+     server before.
+
+
+################################################################################
+#                                                                              #
+#                                  Commands                                    #
+#                                                                              #
+################################################################################
+
+  NoPwnage currently only has one command.
+
+   "/nopwnage" (in chat) or "nopwnage" (in console)
+
+     Toggle NoPwnage on/off
 
 
 ################################################################################

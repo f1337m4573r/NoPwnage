@@ -37,7 +37,7 @@ public class NoPwnage extends JavaPlugin {
             data.setLocation(l);
         }
 
-        log("NoPwnage has been enabled!");
+        System.out.println("[NoPwnage] version ["+this.getDescription().getVersion() + "] has been enabled!");
     }
 
     public void onDisable() {
@@ -70,7 +70,7 @@ public class NoPwnage extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if(commandLabel.equalsIgnoreCase("pwnage")) {
+        if(commandLabel.equalsIgnoreCase("nopwnage")) {
             if(sender.hasPermission(Permissions.ADMIN)) {
                 enabled = !enabled;
                 if(enabled) {
