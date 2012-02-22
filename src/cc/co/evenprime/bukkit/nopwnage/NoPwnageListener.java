@@ -9,7 +9,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 public class NoPwnageListener implements Listener {
 
@@ -35,7 +34,7 @@ public class NoPwnageListener implements Listener {
             return;
 
         PlayerData data = plugin.getData(player);
-        long time = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
         Location location = player.getLocation();
 
         double suspicion = 0;
@@ -46,88 +45,82 @@ public class NoPwnageListener implements Listener {
             data.setLocation(location);
         } else if(!data.compareLocation(location)) {
             data.setLocation(location);
-            data.lastMovedTime = time;
+            data.lastMovedTime = now;
         }
 
         String message = event.getMessage();
 
-        if(config.banned && time - lastBanCausingMessageTime < config.bannedTimeout && similar(message, lastBanCausingMessage)) {
+        if(config.banned && now - lastBanCausingMessageTime < config.bannedTimeout && similar(message, lastBanCausingMessage)) {
             suspicion += config.bannedWeight;
             addReason(reasons, "banned message", config.bannedWeight);
         }
 
-        if(config.first && time - data.joinTime <= config.firstTimeout) {
+        if(config.first && now - data.joinTime <= config.firstTimeout) {
             suspicion += config.firstWeight;
             addReason(reasons, "first message", config.firstWeight);
         }
 
-        if(config.global && time - lastGlobalMessageTime < config.globalTimeout && similar(message, lastGlobalMessage)) {
+        if(config.global && now - lastGlobalMessageTime < config.globalTimeout && similar(message, lastGlobalMessage)) {
             globalRepeated++;
-            if(globalRepeated > 3) {
-                globalRepeated = 3;
-            }
-            int added = globalRepeated * config.globalWeight;
+            int added = (int) (Math.sqrt(globalRepeated) * config.globalWeight);
             suspicion += added;
             addReason(reasons, "global message repeat", added);
         } else {
             globalRepeated = 0;
         }
 
-        if(config.speed && time - data.lastMessageTime <= config.speedTimeout) {
+        if(config.speed && now - data.lastMessageTime <= config.speedTimeout) {
             suspicion += config.speedWeight;
             addReason(reasons, "message speed", config.speedWeight);
         }
 
-        if(config.repeat && time - data.lastMessageTime <= config.repeatTimeout && similar(message, data.lastMessage)) {
-            data.repeats++;
-            if(data.repeats > 3) {
-                data.repeats = 3;
-            }
-            int added = data.repeats * config.repeatWeight;
+        if(config.repeat && now - data.lastMessageTime <= config.repeatTimeout && similar(message, data.lastMessage)) {
+            data.messageRepeated++;
+            int added = (int) (Math.sqrt(data.messageRepeated) * config.repeatWeight);
             suspicion += added;
             addReason(reasons, "player message repeat", added);
         } else {
-            data.repeats = 0;
+            data.messageRepeated = 0;
         }
 
         boolean warned = false;
-        if(config.warnPlayers && time - data.lastWarningTime <= config.warnTimeout) {
+        if(config.warnPlayers && now - data.lastWarningTime <= config.warnTimeout) {
             suspicion += 100;
             addReason(reasons, "warned", 100);
             warned = true;
         }
 
-        if(config.move && time - data.lastMovedTime <= config.moveTimeout) {
+        if(config.move && now - data.lastMovedTime <= config.moveTimeout) {
             suspicion -= config.moveWeight;
             addReason(reasons, "moved", -config.moveWeight);
         } else {
-            addReason(reasons, "not moved", config.moveWeight);
+            addReason(reasons, "didn't move", config.moveWeight);
             suspicion += config.moveWeight;
         }
 
-        plugin.log("Suspicion: " + reasons + ": " + suspicion);
+        //plugin.log("Suspicion: " + reasons + ": " + suspicion);
 
         if(suspicion >= config.warnLevel && config.warnPlayers && !warned) {
-            data.lastWarningTime = time;
+            data.lastWarningTime = now;
             warnPlayer(player);
         } else if(suspicion >= config.banLevel) {
             lastBanCausingMessage = message;
-            lastBanCausingMessageTime = time;
-            data.lastWarningTime = time;
+            lastBanCausingMessageTime = now;
+            data.lastWarningTime = now;
             if(config.warnOthers) {
                 warnOthers(player);
             }
-            banPlayer(player, "Spambotlike behaviour");
+            runCommands(player, "Spambotlike behaviour");
             plugin.log(player.getName() + " banned for " + reasons + ": " + suspicion);
             event.setCancelled(true);
             return;
         }
 
         data.lastMessage = message;
-        data.lastMessageTime = time;
+        data.lastMessageTime = now;
 
         lastGlobalMessage = message;
-        lastGlobalMessageTime = time;
+        lastGlobalMessageTime = now;
     }
 
     @EventHandler
@@ -136,19 +129,20 @@ public class NoPwnageListener implements Listener {
         Player player = event.getPlayer();
         PlayerData data = plugin.getData(player);
         long now = System.currentTimeMillis();
+        NoPwnageConfiguration config = plugin.getNPconfig();
 
-        if(plugin.enabled && data.leaveTime != 0) {
-            if(now - data.leaveTime <= 5000 && !player.hasPermission(Permissions.LOGIN)) {
-                if(now - data.lastRelogWarningTime < 30000) {
-                    banPlayer(player, "Relogged too fast!");
-                    plugin.log("Banned " + player.getName() + " for relogging too fast. Possible hacks. IP: " + player.getAddress().toString().substring(1));
-                    data.leaveTime = 0;
-                } else {
-                    player.sendMessage("[NoPwnage]: " + ChatColor.DARK_RED + "You relogged really fast! If you do it again, you're going to be banned.");
-                    data.lastRelogWarningTime = now;
-                }
-            } else {
-                plugin.log(player.getName() + " is suspicious for logging in too fast! Not banned due to permissions.");
+        if(plugin.enabled && config.relog && now - data.leaveTime <= config.relogTime && !player.hasPermission(Permissions.LOGIN)) {
+            if(now - data.lastRelogWarningTime >= config.relogTimeout) {
+                data.relogWarnings = 0;
+            }
+
+            if(data.relogWarnings < config.relogWarnings) {
+                player.sendMessage("[NoPwnage]: " + ChatColor.DARK_RED + "You relogged really fast! If you keep doing that, you're going to be banned.");
+                data.lastRelogWarningTime = now;
+                data.relogWarnings++;
+            } else if(now - data.lastRelogWarningTime < config.relogTimeout) {
+                runCommands(player, "Relogged too fast!");
+                plugin.log(player.getName() + " from " + player.getAddress().toString().substring(1) + " handled for relogging too fast.");
             }
 
         }
@@ -158,7 +152,7 @@ public class NoPwnageListener implements Listener {
         data.joinTime = now;
     }
 
-    @EventHandler
+    /*@EventHandler
     public void leave(PlayerQuitEvent event) {
 
         Player player = event.getPlayer();
@@ -168,14 +162,14 @@ public class NoPwnageListener implements Listener {
 
         if(plugin.enabled) {
             if(now - data.joinTime <= 300) {
-                banPlayer(player, "");
+                runCommands(player, "");
                 plugin.log(player.getName() + " Disconnected in under 300 milliseconds; he's now banned.");
             }
         }
 
         data.leaveTime = now;
 
-    }
+    }*/
 
     private void addReason(StringBuilder builder, String reason, int value) {
         if(builder.length() > 0) {
@@ -194,7 +188,7 @@ public class NoPwnageListener implements Listener {
         player.sendMessage(ChatColor.DARK_RED + "Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
     }
 
-    private void banPlayer(Player player, String reason) {
+    private void runCommands(Player player, String reason) {
         NoPwnageConfiguration config = plugin.getNPconfig();
         String name = player.getName();
         String ip = player.getAddress().toString().substring(1).split(":")[0];
@@ -208,6 +202,10 @@ public class NoPwnageListener implements Listener {
         }
     }
 
+    private boolean similar(String message1, String message2) {
+        return message1 != null && message2 != null && (stringDifference(message1, message2) < 1 + (message1.length() / 10));
+    }
+
     private int minimum(int a, int b, int c) {
         int mi;
 
@@ -219,11 +217,6 @@ public class NoPwnageListener implements Listener {
             mi = c;
         }
         return mi;
-
-    }
-
-    private boolean similar(String message1, String message2) {
-        return message1 != null && message2 != null && (stringDifference(message1, message2) < 1 + (message1.length() / 10));
     }
 
     private int stringDifference(String s, String t) {

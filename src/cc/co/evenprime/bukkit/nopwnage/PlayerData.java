@@ -10,9 +10,10 @@ public class PlayerData {
     public long joinTime;
     public long leaveTime;
     public long lastWarningTime;
-    public int repeats;
+    public int messageRepeated;
     public long lastRelogWarningTime;
     public long lastMovedTime;
+    public int relogWarnings;
 
     private static class Loc {
 

@@ -28,6 +28,10 @@ public class NoPwnageConfiguration {
     private static final String BANNED_ENABLED = "bannedMessageRepeat.enabled";
     private static final String BANNED_WEIGHT = "bannedMessageRepeat.weight";
     private static final String BANNED_TIMEOUT = "globalMessageRepeat.timeout";
+    private static final String RELOG_ENABLED = "relog.enabled";
+    private static final String RELOG_TIME = "relog.time";
+    private static final String RELOG_WARNINGS = "relog.warnings";
+    private static final String RELOG_TIMEOUT = "relog.timeout";
     private static final String COMMANDS = "commands";
 
     public final boolean warnPlayers;
@@ -59,6 +63,11 @@ public class NoPwnageConfiguration {
     public final boolean banned;
     public final int bannedWeight;
     public final long bannedTimeout;
+
+    public final boolean relog;
+    public final long relogTime;
+    public final int relogWarnings;
+    public final long relogTimeout;
 
     public final String[] commands;
 
@@ -120,6 +129,15 @@ public class NoPwnageConfiguration {
         this.banned = config.getBoolean(BANNED_ENABLED);
         this.bannedWeight = config.getInt(BANNED_WEIGHT);
         this.bannedTimeout = config.getLong(BANNED_TIMEOUT);
+
+        config.addDefault(RELOG_ENABLED, true);
+        config.addDefault(RELOG_TIME, 1500);
+        config.addDefault(RELOG_WARNINGS, 1);
+        config.addDefault(RELOG_TIMEOUT, 60000);
+        this.relog = config.getBoolean(RELOG_ENABLED);
+        this.relogTime = config.getLong(RELOG_TIME);
+        this.relogWarnings = config.getInt(RELOG_WARNINGS);
+        this.relogTimeout = config.getLong(RELOG_TIMEOUT);
 
         config.addDefault(COMMANDS, "kick [player]; ban [player]; ban-ip [ip]");
         this.commands = config.getString(COMMANDS).split(";");
