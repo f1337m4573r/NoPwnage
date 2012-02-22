@@ -91,11 +91,12 @@ public class NoPwnageListener implements Listener {
         }
 
         if(config.move && now - data.lastMovedTime <= config.moveTimeout) {
-            suspicion -= config.moveWeight;
-            addReason(reasons, "moved", -config.moveWeight);
+            suspicion -= config.moveWeightBonus;
+            addReason(reasons, "moved", -config.moveWeightBonus);
         } else {
-            addReason(reasons, "didn't move", config.moveWeight);
-            suspicion += config.moveWeight;
+            suspicion += config.moveWeightMalus;
+            addReason(reasons, "didn't move", config.moveWeightMalus);
+
         }
 
         //plugin.log("Suspicion: " + reasons + ": " + suspicion);

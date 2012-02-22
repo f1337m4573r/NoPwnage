@@ -1,0 +1,170 @@
+
+################################################################################
+#                                                                              #
+#                              config.yml                                      #
+#                                                                              #
+################################################################################
+
+ 1) The config file for NoPwnage is called "config.yml", you can find it
+    after the first time you run the tool in the folder "plugins/NoPwnage" of
+    your Bukkit directory.
+
+ 2) Never change the amount of white-spaces in front of options in the config 
+    file "config.yml". It will break the configuration.
+
+
+################################################################################
+#                                                                              #
+#                            How the plugin works                              #
+#                                                                              #
+################################################################################
+
+ NoPwnage will assign each message of each player a certain "suspicion" value,
+ based on numerous properties, circumstances etc.
+ 
+ If a message of a player reaches a specific suspicion level, the player may
+ get warned to change his behaviour. If he reaches an even higher suspicion
+ level, he will get banned (by default) or otherwise handled, depending on the
+ config file.
+ 
+ In addition to that, players that rejoin the game after leaving it really fast
+ will also be subjected to warnings and finally penalties.
+
+ You have control about how much suspicion each property of the message will
+ "earn". For most properties you have the option:
+ 
+ - enabled: should this property be considered at all
+ 
+ - weight:  how much suspicion is given for full-filling the conditions
+ 
+ - timeout: how much time in milliseconds (1000 = 1 second) has to pass before
+            this property becomes reset/ignored (depends on the property).
+
+
+################################################################################
+#                                                                              #
+#                        All available config settings                         #
+#                                                                              #
+################################################################################
+
+ Here you'll find the whole list of settings that you can manipulate in the 
+ config.yml file. It is further split into logical sections
+
+  warnPlayers:
+    Should a player that reaches the "warnLevel" get a text message telling
+    him that he is under suspicion of being a bot.
+
+  warnOthers:
+    Should all players get warned when a player gets banned for spambot-like 
+    activity?
+
+  warnLevel:
+    How much suspicion must a message earn to issue a warning for the player
+
+  warnTimeout:
+    After what time (in ms) should a player be considered "unwarned" again.
+
+  banLevel:
+    How much suspicion must a message earn to execute the "commands" (usually
+    ban the player). If warnings for players are enabled and the player hasn't
+    been warned yet, he'll get warned instead.
+
+  move.enabled:
+  move.weightbonus:
+  move.weightmalus:
+  move.timeout:
+    NoPwnage will check if a player moved within the "timeout" timeframe. If
+    he did move, the suspicion will be reduced by the "weightbonus" value. If 
+    he did not move, the suspicion will be increased by "weightmalus" value.
+    Only used if "enabled".
+
+  messageRepeat.enabled:
+  messageRepeat.weight:
+  messageRepeat.timeout:
+    NoPwnage will check if a player repeats his messages within the "timeout" 
+    timeframe. Even if the message is a bit different, it will be counted as
+    being a repetition. The suspicion is increased by "weight" times the square
+    root of the number of repetitions. This means that multiple repetitions
+    will increase suspicion, but not as much as the first repetition.
+    Only used if "enabled".   
+
+  messageSpeed.enabled:
+  messageSpeed.weight:
+  messageSpeed.timeout:
+    NoPwnage will check if a player sends messages too fast. If a message is
+    sent within "timout" ms after the previous message, increase suspicion by
+    "weight.
+    Only used if "enabled".   
+
+  messageFirst.enabled:
+  messageFirst.weight:
+  messageFirst.timeout:
+    NoPwnage will check if a player sends his first message within "timeout"
+    ms after his login. If he does, increase supspicion by "weight".
+    Only used if "enabled".
+
+  globalMessageRepeat.enabled:
+  globalMessageRepeat.weight:
+  globalMessageRepeat.timeout:
+    NoPwnage will check if a player repeats a message that has been sent by
+    another player just before, within "timeout". If he does, suspicion will
+    be increased by "weight" times the square root of overall repetitions of
+    that message, independent of by which player. This means that multiple
+    repetitions will increase suspicion, but not as much as the first 
+    repetition.
+    Only used if "enabled".
+
+  bannedMessageRepeat.enabled:
+  bannedMessageRepeat.weight:
+  bannedMessageRepeat.timeout:
+    NoPwnage will remember the last message that caused someone to get banned.
+    If a player repeats that message within "timeout" ms, the suspicion will
+    be increased by "weight".
+    Only used if "enabled".
+
+  relog.enabled:
+  relog.time:
+  relog.warnings:
+  relog.timeout:
+    NoPwnage will remember the time when a player leaves the server. If he
+    returns within "time" ms, he will get warned. If he has been warned
+    "warnings" times already, the "commands" will be executed for him. Warnings
+    get removed if the time of the last warning was more than "timeout" ms ago.
+
+  commands:
+    NoPwnage allows you to decide what should happen when a player reaches
+    "banLevel" or relogged too fast. The default is to kick him and ban IP and
+    name. You'll also get a log message to console stating how exactly he
+    reached the "banLevel" (how much suspicion was added by each check).
+    
+    Commands have to be seperated by ";" and the "[player]" and "[ip]"
+    wildcards will be replaced by the actual data during execution.
+
+
+################################################################################
+#                                                                              #
+#                     Other noteworthy stuff, DONATIONS                        #
+#                                                                              #
+################################################################################
+
+
+- NoPwnage isn't one of my "main" plugins and I don't plan on giving too much
+  support for it. It's open source though, so I encourage you to modify and
+  adapt it to your specific needs instead of just using it as is.
+
+- NoPwnage draws inspiration and ideas heavily from the discontinued
+  "AntiPwnage" plugin, but it doesn't take code from it that isn't already
+  free to use (e.g. the used string comparison algorithm) or too simple to be
+  copyright protected (single chat messages, some variable names). 
+  Therefore I don't need any permission to release this plugin as is, 
+  under MIT license.
+  
+- I appreciate DONATIONS very much. If you have some spare money and want to
+  help me out financially, head over to the BukkitDev page:
+  
+          **** http://dev.bukkit.org/server-mods/nopwnage/ ****
+  
+  and use the "donation" button there. Alternatively contact me directly at
+  wilfried.pasquazzo@gmail.com for other means of donations.
+  
+Thank you for reading this file.

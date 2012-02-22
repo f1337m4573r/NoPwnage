@@ -26,6 +26,7 @@ public class NoPwnage extends JavaPlugin {
         this.playerData = new HashMap<String, PlayerData>();
 
         this.config = new NoPwnageConfiguration(this);
+        NoPwnageConfiguration.writeInstructions(this.getDataFolder());
 
         pm.registerEvents(listener, this);
 

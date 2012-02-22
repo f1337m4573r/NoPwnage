@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nopwnage;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.InputStream;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -11,11 +14,12 @@ public class NoPwnageConfiguration {
     private static final String WARNTIMEOUT = "warnTimeout";
     private static final String BANLEVEL = "banLevel";
     private static final String MOVE_ENABLED = "move.enabled";
-    private static final String MOVE_WEIGHT = "move.weight";
+    private static final String MOVE_WEIGHTBONUS = "move.weightbonus";
+    private static final String MOVE_WEIGHTMALUS = "move.weightmalus";
     private static final String MOVE_TIMEOUT = "move.timeout";
     private static final String REPEAT_ENABLED = "messageRepeat.enabled";
-    private static final String REPEAT_WEIGHT = "playerMessageRepeat.weight";
-    private static final String REPEAT_TIMEOUT = "playerMessageRepeat.timeout";
+    private static final String REPEAT_WEIGHT = "messageRepeat.weight";
+    private static final String REPEAT_TIMEOUT = "messageRepeat.timeout";
     private static final String SPEED_ENABLED = "messageSpeed.enabled";
     private static final String SPEED_WEIGHT = "messageSpeed.weight";
     private static final String SPEED_TIMEOUT = "messageSpeed.timeout";
@@ -27,7 +31,7 @@ public class NoPwnageConfiguration {
     private static final String GLOBAL_TIMEOUT = "globalMessageRepeat.timeout";
     private static final String BANNED_ENABLED = "bannedMessageRepeat.enabled";
     private static final String BANNED_WEIGHT = "bannedMessageRepeat.weight";
-    private static final String BANNED_TIMEOUT = "globalMessageRepeat.timeout";
+    private static final String BANNED_TIMEOUT = "bannedMessageRepeat.timeout";
     private static final String RELOG_ENABLED = "relog.enabled";
     private static final String RELOG_TIME = "relog.time";
     private static final String RELOG_WARNINGS = "relog.warnings";
@@ -41,7 +45,8 @@ public class NoPwnageConfiguration {
     public final int banLevel;
 
     public final boolean move;
-    public final int moveWeight;
+    public final int moveWeightBonus;
+    public final int moveWeightMalus;
     public final long moveTimeout;
 
     public final boolean speed;
@@ -89,10 +94,12 @@ public class NoPwnageConfiguration {
         this.banLevel = config.getInt(BANLEVEL);
 
         config.addDefault(MOVE_ENABLED, true);
-        config.addDefault(MOVE_WEIGHT, -200);
+        config.addDefault(MOVE_WEIGHTBONUS, 200);
+        config.addDefault(MOVE_WEIGHTMALUS, 200);
         config.addDefault(MOVE_TIMEOUT, 30000);
         this.move = config.getBoolean(MOVE_ENABLED);
-        this.moveWeight = config.getInt(MOVE_WEIGHT);
+        this.moveWeightBonus = config.getInt(MOVE_WEIGHTBONUS);
+        this.moveWeightMalus = config.getInt(MOVE_WEIGHTMALUS);
         this.moveTimeout = config.getLong(MOVE_TIMEOUT);
 
         config.addDefault(SPEED_ENABLED, true);
@@ -149,5 +156,38 @@ public class NoPwnageConfiguration {
         config.options().copyDefaults(true);
         plugin.saveConfig();
 
+    }
+    
+    public static void writeInstructions(File rootConfigFolder) {
+        InputStream fis = NoPwnageConfiguration.class.getClassLoader().getResourceAsStream("Instructions.txt");
+
+        StringBuffer result = new StringBuffer();
+        try {
+            byte[] buf = new byte[1024];
+            int i = 0;
+            while((i = fis.read(buf)) != -1) {
+                result.append(new String(buf).substring(0, i));
+            }
+
+            File iFile = new File(rootConfigFolder, "Instructions.txt");
+            if(iFile.exists()) {
+                iFile.delete();
+            }
+            FileWriter output = new FileWriter(iFile);
+            String nl = System.getProperty("line.separator");
+            String instructions = result.toString();
+            instructions = instructions.replaceAll("\r\n", "\n");
+            String lines[] = instructions.split("\n");
+
+            for(String line : lines) {
+                output.append(line);
+                output.append(nl);
+            }
+
+            output.flush();
+            output.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

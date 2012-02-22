@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>NoPwnage</groupId>
+	<groupId>cc.co.evenprime.bukkit</groupId>
 	<artifactId>NoPwnage</artifactId>
-	<version>0.9</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 	<name>NoPwnage</name>
 	<properties>
@@ -45,7 +45,11 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<description>Identify and ban bots that connect to the server for the sole purpose of spamming it</description>
+	<url>http://dev.bukkit.org/server-mods/nopwnage</url>
 	<scm>
+		<connection>scm:git:https://github.com/Evenprime/NoPwnage.git</connection>
+		<developerConnection>scm:git:https://github.com/Evenprime/NoPwnage.git</developerConnection>
+		<url>https://github.com/Evenprime/NoPwnage</url>
 	</scm>
 	<build>
 		<sourceDirectory>${basedir}/src</sourceDirectory>
@@ -56,6 +60,9 @@
 				<directory>.</directory>
 				<includes>
 					<include>plugin.yml</include>
+					<include>README.txt</include>
+					<include>LICENSE.txt</include>
+					<include>Instructions.txt</include>
 				</includes>
 			</resource>
 		</resources>
