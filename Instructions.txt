@@ -119,18 +119,21 @@
   messageRepeat.timeout:
     NoPwnage will check if a player repeats his messages within the "timeout" 
     timeframe. Even if the message is a bit different, it will be counted as
-    being a repetition. The suspicion is increased by "weight" times the square
-    root of the number of repetitions. This means that multiple repetitions
+    being a repetition. The suspicion is increased by "weight" and for each
+    additional repetition by "weight/2". This means that multiple repetitions
     will increase suspicion, but not as much as the first repetition.
-    Only used if "enabled".   
+    Only used if "enabled".
 
   messageSpeed.enabled:
   messageSpeed.weight:
   messageSpeed.timeout:
     NoPwnage will check if a player sends messages too fast. If a message is
     sent within "timout" ms after the previous message, increase suspicion by
-    "weight.
-    Only used if "enabled".   
+    "weight". For each additional message that is sent within "timeout",
+    the suspicion is increased by "weight/2". This means that multiple 
+    too fast sent messages in a row will increase suspicion, but not as much as
+    the first.
+    Only used if "enabled".
 
   messageFirst.enabled:
   messageFirst.weight:
@@ -144,10 +147,9 @@
   globalMessageRepeat.timeout:
     NoPwnage will check if a player repeats a message that has been sent by
     another player just before, within "timeout". If he does, suspicion will
-    be increased by "weight" times the square root of overall repetitions of
-    that message, independent of by which player. This means that multiple
-    repetitions will increase suspicion, but not as much as the first 
-    repetition.
+    be increased by "weight" and for each additional repetition by "weight/2",
+    independent of by which player. This means that multiple repetitions will
+    increase suspicion, but not as much as the first repetition.
     Only used if "enabled".
 
   bannedMessageRepeat.enabled:

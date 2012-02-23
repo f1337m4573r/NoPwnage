@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class NoPwnageListener implements Listener {
@@ -24,13 +25,21 @@ public class NoPwnageListener implements Listener {
         this.plugin = instance;
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void chat(PlayerChatEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void command(PlayerCommandPreprocessEvent event) {
+        test(event, true);
+    }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void chat(PlayerChatEvent event) {
+        test(event, false);
+    }
+
+    private void test(PlayerChatEvent event, boolean isCommand) {
         Player player = event.getPlayer();
         NoPwnageConfiguration config = plugin.getNPconfig();
 
-        if(event.isCancelled() || !plugin.enabled || player.hasPermission(Permissions.SPAM) || player.hasPermission(Permissions.ADMIN))
+        if(!plugin.enabled || player.hasPermission(Permissions.SPAM) || player.hasPermission(Permissions.ADMIN))
             return;
 
         PlayerData data = plugin.getData(player);
@@ -50,7 +59,7 @@ public class NoPwnageListener implements Listener {
 
         String message = event.getMessage();
 
-        if(config.banned && now - lastBanCausingMessageTime < config.bannedTimeout && similar(message, lastBanCausingMessage)) {
+        if(!isCommand && config.banned && now - lastBanCausingMessageTime < config.bannedTimeout && similar(message, lastBanCausingMessage)) {
             suspicion += config.bannedWeight;
             addReason(reasons, "banned message", config.bannedWeight);
         }
@@ -60,25 +69,32 @@ public class NoPwnageListener implements Listener {
             addReason(reasons, "first message", config.firstWeight);
         }
 
-        if(config.global && now - lastGlobalMessageTime < config.globalTimeout && similar(message, lastGlobalMessage)) {
+        if(!isCommand && config.global && now - lastGlobalMessageTime < config.globalTimeout && similar(message, lastGlobalMessage)) {
+            int added = ((globalRepeated + 2) * config.globalWeight) / 2;
             globalRepeated++;
-            int added = (int) (Math.sqrt(globalRepeated) * config.globalWeight);
             suspicion += added;
-            addReason(reasons, "global message repeat", added);
+            addReason(reasons, "global message repeat (" + globalRepeated + ")", added);
         } else {
             globalRepeated = 0;
         }
 
         if(config.speed && now - data.lastMessageTime <= config.speedTimeout) {
-            suspicion += config.speedWeight;
-            addReason(reasons, "message speed", config.speedWeight);
+            int added = ((data.speedRepeated + 2) * config.speedWeight) / 2;
+            data.speedRepeated++;
+            if(isCommand)
+                added /= 4;
+            suspicion += added;
+            addReason(reasons, "message speed (" + data.speedRepeated + ")", added);
+        } else {
+            data.speedRepeated = 0;
         }
 
-        if(config.repeat && now - data.lastMessageTime <= config.repeatTimeout && similar(message, data.lastMessage)) {
+        if(!isCommand && config.repeat && now - data.lastMessageTime <= config.repeatTimeout && similar(message, data.lastMessage)) {
+
+            int added = ((data.messageRepeated + 2) * config.repeatWeight) / 2;
             data.messageRepeated++;
-            int added = (int) (Math.sqrt(data.messageRepeated) * config.repeatWeight);
             suspicion += added;
-            addReason(reasons, "player message repeat", added);
+            addReason(reasons, "player message repeat (" + data.messageRepeated + ")", added);
         } else {
             data.messageRepeated = 0;
         }

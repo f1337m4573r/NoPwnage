@@ -43,7 +43,7 @@ public class NoPwnage extends JavaPlugin {
     public void onDisable() {
         this.playerData = null;
 
-        log("NoPwnage has been disabled!");
+        System.out.println("NoPwnage version ["+this.getDescription().getVersion() + "] has been disabled!");
     }
 
     public void log(String message) {

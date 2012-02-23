@@ -14,6 +14,7 @@ public class PlayerData {
     public long lastRelogWarningTime;
     public long lastMovedTime;
     public int relogWarnings;
+    public int speedRepeated;
 
     private static class Loc {
 
